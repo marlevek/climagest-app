@@ -1,0 +1,60 @@
+<form method="post" id="clienteForm">
+    {% csrf_token %}
+    <label>Tipo de Pessoa:</label><br>
+    <select name="tipo" id="tipoPessoa" class="form-control" required>
+      <option value="">-- Selecione --</option>
+      <option value="F">Pessoa Física</option>
+      <option value="J">Pessoa Jurídica</option>
+    </select><br>
+  
+    <div id="campoCPF" style="display:none;">
+      <label>CPF:</label>
+      <input type="text" name="cpf" class="form-control">
+    </div>
+  
+    <div id="campoCNPJ" style="display:none;">
+      <label>CNPJ:</label>
+      <input type="text" name="cnpj" id="cnpj" class="form-control">
+    </div>
+  
+    <label>Nome:</label>
+    <input type="text" name="nome" class="form-control" required><br>
+  
+    <label>Telefone:</label>
+    <input type="text" name="telefone" class="form-control"><br>
+  
+    <label>Email:</label>
+    <input type="email" name="email" class="form-control"><br>
+  
+    <label>Endereço:</label>
+    <textarea name="endereco" id="endereco" class="form-control"></textarea><br>
+  
+    <button type="submit" class="btn btn-primary">Salvar</button>
+  </form>
+  
+  <script>
+    const tipoPessoa = document.getElementById('tipoPessoa');
+    const campoCPF = document.getElementById('campoCPF');
+    const campoCNPJ = document.getElementById('campoCNPJ');
+  
+    tipoPessoa.addEventListener('change', function () {
+      campoCPF.style.display = this.value === 'F' ? 'block' : 'none';
+      campoCNPJ.style.display = this.value === 'J' ? 'block' : 'none';
+    });
+  
+    // Consulta CNPJ ao sair do campo
+    document.getElementById('cnpj').addEventListener('blur', function () {
+      const cnpj = this.value.replace(/\D/g, '');
+      if (cnpj.length === 14) {
+        fetch(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.logradouro) {
+              document.getElementById('endereco').value =
+                `${data.logradouro}, ${data.numero} - ${data.bairro}, ${data.municipio} - ${data.uf}, CEP ${data.cep}`;
+            }
+          });
+      }
+    });
+  </script>
+  
